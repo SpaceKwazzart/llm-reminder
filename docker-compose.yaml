@@ -26,8 +26,6 @@ services:
       - local_net
 
     restart: always
-    ports:
-      - "8000:8000"
 
     hostname: reminder
     healthcheck:
