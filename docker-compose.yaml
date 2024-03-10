@@ -1,0 +1,54 @@
+version: "3"
+
+services:
+  web:
+    image: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+
+    networks:
+      - local_net
+      - global_net
+
+    depends_on:
+      - server_app
+
+    build: ./nginx
+
+  server_app:
+    image: reminder
+    container_name: reminder
+
+    env_file: server/.env
+
+    networks:
+      - local_net
+
+    restart: always
+    ports:
+      - "8000:8000"
+
+    hostname: reminder
+    healthcheck:
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+    build:
+      context: ./server
+
+volumes:
+  reminderAI_db_vol:
+    name: reminderAI_db_vol
+
+networks:
+  local_net:
+    name: local_net
+    driver: bridge
+    internal: true
+
+  global_net:
+    name: global_net
+    driver: bridge
+    external: true

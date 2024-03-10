@@ -1,4 +1,0 @@
-python-dotenv
-
-Django==5.0.3
-djangorestframework
