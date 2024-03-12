@@ -10,6 +10,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    environment: 
+      name: project
     strategy:
       max-parallel: 4
       matrix:
