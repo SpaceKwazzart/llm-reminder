@@ -1,7 +1,12 @@
 python-dotenv
+pylint
+pre-commit
+
 uvicorn
 
 Django==5.0.3
 djangorestframework
+
+pymongo
 
 langchain
