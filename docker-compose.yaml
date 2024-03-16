@@ -28,6 +28,12 @@ services:
 
     restart: always
 
+    depends_on:
+      postgres:
+        condition: service_healthy
+      # mongo:
+      #   condition: service_healthy
+
     hostname: reminder
     healthcheck:
       interval: 5s
@@ -37,9 +43,74 @@ services:
     build:
       context: ./server
 
+  postgres:
+    image: postgres
+    container_name: postgres
+    user: postgres
+
+    # environment:
+    #  - POSTGRES_USER=postgres
+    #  - POSTGRES_PASSWORD=54321123713v
+    env_file: server/.env
+
+    networks:
+      - local_net
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - reminderAI_postgres_vol:/var/lib/postgresql/data
+
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pg-admin:
+    image: dpage/pgadmin4
+    container_name: pg
+    env_file: server/.env
+    networks:
+      - local_net
+      - global_net
+    ports:
+      - "5050:5050"
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  mongo:
+    image: mongo
+    container_name: mongo
+    hostname: mongo
+
+    env_file: server/.env
+
+    networks:
+      - local_net
+
+    volumes:
+      - reminderAI_mongo_vol:/data/db
+
+    restart: always
+    ports:
+      - "27017:27017"
+
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.runCommand('ping').ok"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
 volumes:
-  reminderAI_db_vol:
-    name: reminderAI_db_vol
+  reminderAI_postgres_vol:
+    name: reminderAI_postgres_vol
+
+  reminderAI_mongo_vol:
+    name: reminderAI_mongo_vol
 
 networks:
   local_net:
